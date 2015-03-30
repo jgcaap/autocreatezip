@@ -1,0 +1,25 @@
+./unpackimg.sh boot.img
+rm split_img/boot.img-dtb
+rm split_img/boot.img-zImage
+dtbToolCM -2 -o /home/jgcaap/oneplus/ramdisk/split_img/boot.img-dtb -s 2048 -p /home/jgcaap/msm8974/scripts/dtc/ /home/jgcaap/msm8974/arch/arm/boot/
+dtbToolCM -2 -o /split_img/boot.img-dtb -s 2048 -p ../one_plus_one/scripts/dtc/ ../one_plus_one/arch/arm/boot/
+cp arch/arm/boot/zImage ../ramdisk_one_plus_one/split_img/boot.img-zImage
+cp /home/jgcaap/msm8974/arch/arm/boot/zImage /home/jgcaap/oneplus/ramdisk/split_img/boot.img-zImage
+mkbootimg --kernel /home/jgcaap/cmkernel/arch/arm/boot/zImage --ramdisk /home/jgcaap/oneplus/ramdisk.gz --cmdline "$(cat /home/jgcaap/oneplus/cmdline)" --pagesize 2048 --base 0x00000000 --ramdisk_offset 0x02000000 --tags_offset 0x00000100 --dt dt.img -o boot.img
+echo "boot.img ready"
+mv boot.img flashzip
+cd flashzip
+zip -r9 jgcaap-kernel.zip * -x README jgcaap-kernel.zip
+echo "flash zip ready"
+cd ..
+rm -f boot.img
+cp /original/boot.img
+
+./repackimg.sh
+echo "making zip file"
+cp ../ramdisk/image-new.img zip/boot.img
+cd zip/
+rm -f *.zip
+zip -r -9 $zipfile *
+rm -f /tmp/*.zip
+cp *.zip /tmp
